@@ -43,12 +43,24 @@ Render offers free hosting for both frontend and backend with a PostgreSQL/SQLit
    git push -u origin main
    ```
 
-### Step 2: Deploy Backend to Render
+### Step 2: Create PostgreSQL Database on Render
 
-1. Go to [render.com](https://render.com) and sign up/login
-2. Click **"New +"** → **"Web Service"**
-3. Connect your GitHub repository
-4. Configure the service:
+1. In Render Dashboard, click **"New +"** → **"PostgreSQL"**
+2. Configure:
+   - **Name**: `job-tracker-db`
+   - **Database**: `jobtracker` (or any name)
+   - **User**: (auto-generated)
+   - **Region**: Same as your backend
+   - **Instance Type**: **Free**
+3. Click **"Create Database"**
+4. Wait for it to provision (1-2 minutes)
+5. **Copy the "Internal Database URL"** (you'll need this)
+
+### Step 3: Deploy Backend to Render
+
+1. Click **"New +"** → **"Web Service"**
+2. Connect your GitHub repository
+3. Configure the service:
    - **Name**: `job-tracker-backend`
    - **Root Directory**: `backend`
    - **Environment**: `Node`
@@ -56,34 +68,25 @@ Render offers free hosting for both frontend and backend with a PostgreSQL/SQLit
    - **Start Command**: `npm start`
    - **Instance Type**: `Free`
 
-5. **Add Persistent Disk (IMPORTANT - Prevents data loss)**:
-   - Click **"Disks"** in the left sidebar
-   - Click **"Add Disk"**
-   - Configure:
-     - **Name**: `database`
-     - **Mount Path**: `/var/data`
-     - **Size**: `1 GB` (free tier)
-   - Click **"Create"**
-
-6. Add environment variables:
+4. Add environment variables:
    - Click **"Environment"** tab
    - Add these variables:
      ```
      NODE_ENV=production
      PORT=5000
-     DB_DIR=/var/data
+     DATABASE_URL=paste-your-internal-database-url-here
      ADMIN_USERNAME=your-chosen-admin-username
      ADMIN_PASSWORD=your-secure-admin-password
      ```
    - ⚠️ **IMPORTANT**:
+     - Use the **Internal Database URL** from Step 2
      - Choose a strong password for `ADMIN_PASSWORD`
-     - `DB_DIR` must match your disk mount path
    - These credentials are stored securely on Render and NOT in your code
 
-7. Click **"Create Web Service"** (or "Save" if already created)
-8. **Copy your backend URL** (e.g., `https://job-tracker-backend.onrender.com`)
+5. Click **"Create Web Service"**
+6. **Copy your backend URL** (e.g., `https://job-tracker-backend.onrender.com`)
 
-### Step 3: Deploy Frontend to Render
+### Step 4: Deploy Frontend to Render
 
 1. Click **"New +"** → **"Static Site"**
 2. Connect the same GitHub repository
@@ -104,7 +107,7 @@ Render offers free hosting for both frontend and backend with a PostgreSQL/SQLit
 5. Click **"Create Static Site"**
 6. **Your app will be live!** 🎉
 
-### Step 4: Update Backend CORS
+### Step 5: Update Backend CORS
 
 1. Go back to your backend service on Render
 2. Add another environment variable:
@@ -114,6 +117,10 @@ Render offers free hosting for both frontend and backend with a PostgreSQL/SQLit
    (Replace with your actual frontend URL)
 
 3. The backend will restart automatically
+
+---
+
+**🎉 Your app is now live with persistent PostgreSQL database!**
 
 ---
 
