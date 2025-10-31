@@ -45,9 +45,12 @@ const db = {
         pgParams = params;
       }
 
+      console.log('[DB] Executing query:', pgSql, 'with params:', pgParams);
       const result = await dbModule.query(pgSql, pgParams);
+      console.log('[DB] Result:', result.rows[0]);
       callback(null, result.rows[0]);
     } catch (err) {
+      console.error('[DB] Query error:', err);
       callback(err);
     }
   },
