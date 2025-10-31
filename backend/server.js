@@ -385,22 +385,37 @@ app.post('/api/signup', async (req, res) => {
 // LOGIN: return user role + token
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Username and password required' });
+  }
+
   db.get('SELECT id, username, passwordHash, role FROM users WHERE username = ?', [username], async (err, user) => {
+    if (err) {
+      console.error('Login database error:', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const isValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isValid) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
-    }
+    try {
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      }
 
-    // Fake token + include role
-    res.json({
-      success: true,
-      token: 'fake-jwt-' + user.id,
-      user: { id: user.id, username: user.username, role: user.role }
-    });
+      // Fake token + include role
+      res.json({
+        success: true,
+        token: 'fake-jwt-' + user.id,
+        user: { id: user.id, username: user.username, role: user.role }
+      });
+    } catch (bcryptErr) {
+      console.error('Bcrypt error:', bcryptErr);
+      return res.status(500).json({ success: false, message: 'Authentication error' });
+    }
   });
 });
 
