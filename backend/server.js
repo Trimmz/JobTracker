@@ -405,5 +405,9 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Backend running on http://localhost:${PORT}`);
+  console.log(`✅ Backend running on port ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🔗 CORS allowed origins:`, allowedOrigins);
+  console.log(`🗄️  Database: ${process.env.DATABASE_URL ? 'PostgreSQL' : 'SQLite'}`);
+  console.log(`👤 Admin: ${process.env.ADMIN_USERNAME || 'Not configured'}`);
 });

@@ -8,13 +8,14 @@ const pool = new Pool({
 });
 
 // Test connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection error:', err);
-  } else {
+pool.query('SELECT NOW()')
+  .then(() => {
     console.log('✅ PostgreSQL database connected successfully');
-  }
-});
+  })
+  .catch((err) => {
+    console.error('❌ Database connection error:', err);
+    console.error('DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+  });
 
 // Initialize database tables
 async function initializeDatabase() {
