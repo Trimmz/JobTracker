@@ -58,11 +58,15 @@ Render offers free hosting for both frontend and backend with a PostgreSQL/SQLit
 
 5. Add environment variables:
    - Click **"Environment"** tab
-   - Add:
+   - Add these variables:
      ```
      NODE_ENV=production
      PORT=5000
+     ADMIN_USERNAME=your-chosen-admin-username
+     ADMIN_PASSWORD=your-secure-admin-password
      ```
+   - ⚠️ **IMPORTANT**: Choose a strong password for `ADMIN_PASSWORD`
+   - These credentials are stored securely on Render and NOT in your code
 
 6. Click **"Create Web Service"**
 7. **Copy your backend URL** (e.g., `https://job-tracker-backend.onrender.com`)
@@ -225,13 +229,15 @@ npm run preview
 
 ---
 
-## Default Admin Account
+## Admin Account Setup
+
+Your admin account credentials are set via **environment variables** on Render (not in the code).
 
 After deployment, you can log in with:
-- **Username**: `admin`
-- **Password**: `password123`
+- **Username**: Whatever you set for `ADMIN_USERNAME`
+- **Password**: Whatever you set for `ADMIN_PASSWORD`
 
-**⚠️ IMPORTANT**: Change this password immediately after first login!
+**✅ SECURE**: These credentials are stored securely in Render's environment variables and never exposed in your open-source code!
 
 ---
 

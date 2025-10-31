@@ -61,22 +61,37 @@ db.serialize(() => {
     )
     `);
 
-    // Insert default admin (only if not exists)
-    db.get(`SELECT * FROM users WHERE username = 'admin'`, (err, row) => {
-    if (!row) {
-        const bcrypt = require('bcrypt');
-        const saltRounds = 10;
-        const adminPass = 'password123';
-        bcrypt.hash(adminPass, saltRounds, (err, hash) => {
-        if (err) return console.error('Failed to create admin:', err);
-        db.run(
-            `INSERT INTO users (username, passwordHash, role) VALUES (?, ?, ?)`,
-            ['admin', hash, 'admin']
-        );
-        console.log('✅ Default admin created: username=admin, password=password123');
+    // Insert default admin from environment variables (only if not exists)
+    const adminUsername = process.env.ADMIN_USERNAME;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminUsername && adminPassword) {
+        db.get(`SELECT * FROM users WHERE username = ?`, [adminUsername], (err, row) => {
+            if (!row) {
+                const bcrypt = require('bcrypt');
+                const saltRounds = 10;
+                bcrypt.hash(adminPassword, saltRounds, (err, hash) => {
+                    if (err) return console.error('❌ Failed to create admin:', err);
+                    db.run(
+                        `INSERT INTO users (username, passwordHash, role) VALUES (?, ?, ?)`,
+                        [adminUsername, hash, 'admin'],
+                        function(err) {
+                            if (err) {
+                                console.error('❌ Failed to create admin user:', err);
+                            } else {
+                                console.log(`✅ Admin user created: ${adminUsername}`);
+                            }
+                        }
+                    );
+                });
+            } else {
+                console.log(`✅ Admin user already exists: ${adminUsername}`);
+            }
         });
+    } else {
+        console.warn('⚠️  ADMIN_USERNAME and ADMIN_PASSWORD not set in environment variables');
+        console.warn('⚠️  No admin user will be created. Set these variables to create an admin account.');
     }
-    });
 });
 
 module.exports = db;
