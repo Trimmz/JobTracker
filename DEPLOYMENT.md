@@ -56,20 +56,32 @@ Render offers free hosting for both frontend and backend with a PostgreSQL/SQLit
    - **Start Command**: `npm start`
    - **Instance Type**: `Free`
 
-5. Add environment variables:
+5. **Add Persistent Disk (IMPORTANT - Prevents data loss)**:
+   - Click **"Disks"** in the left sidebar
+   - Click **"Add Disk"**
+   - Configure:
+     - **Name**: `database`
+     - **Mount Path**: `/var/data`
+     - **Size**: `1 GB` (free tier)
+   - Click **"Create"**
+
+6. Add environment variables:
    - Click **"Environment"** tab
    - Add these variables:
      ```
      NODE_ENV=production
      PORT=5000
+     DB_DIR=/var/data
      ADMIN_USERNAME=your-chosen-admin-username
      ADMIN_PASSWORD=your-secure-admin-password
      ```
-   - ⚠️ **IMPORTANT**: Choose a strong password for `ADMIN_PASSWORD`
+   - ⚠️ **IMPORTANT**:
+     - Choose a strong password for `ADMIN_PASSWORD`
+     - `DB_DIR` must match your disk mount path
    - These credentials are stored securely on Render and NOT in your code
 
-6. Click **"Create Web Service"**
-7. **Copy your backend URL** (e.g., `https://job-tracker-backend.onrender.com`)
+7. Click **"Create Web Service"** (or "Save" if already created)
+8. **Copy your backend URL** (e.g., `https://job-tracker-backend.onrender.com`)
 
 ### Step 3: Deploy Frontend to Render
 
@@ -247,9 +259,12 @@ After deployment, you can log in with:
 - Make sure `FRONTEND_URL` in backend matches your actual frontend URL
 - Check that both services are using HTTPS
 
-### Database Not Persisting
-- Render's free tier may reset the SQLite database
-- Consider upgrading to a persistent volume or using PostgreSQL
+### Database Not Persisting (Data Lost on Restart)
+**Solution**: Add a persistent disk to your backend service:
+1. Go to backend service → **Disks** → **Add Disk**
+2. Mount Path: `/var/data`, Size: 1GB
+3. Add environment variable: `DB_DIR=/var/data`
+4. Redeploy - data will now persist!
 
 ### Build Fails
 - Check that `package.json` has the correct dependencies

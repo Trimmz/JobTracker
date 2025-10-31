@@ -1,8 +1,26 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
-const dbPath = path.resolve(__dirname, 'applications.db');
-const db = new sqlite3.Database(dbPath);
+// Use persistent storage on Render, fallback to local for development
+const isProd = process.env.NODE_ENV === 'production';
+const dbDir = isProd && process.env.DB_DIR ? process.env.DB_DIR : __dirname;
+
+// Ensure directory exists
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const dbPath = path.join(dbDir, 'applications.db');
+console.log(`📁 Database path: ${dbPath}`);
+
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('❌ Database connection error:', err);
+  } else {
+    console.log('✅ Database connected successfully');
+  }
+});
 
 // Create table if not exists
 db.serialize(() => {
